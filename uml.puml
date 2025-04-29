@@ -1,0 +1,94 @@
+@startuml
+
+package structure_mini_project {
+
+  ' 최상단: Main
+  class Main {
+    + main(args: String[])
+    + checkDuple(cards: Card[], idx: int): boolean {static}
+  }
+
+  ' 2단계: Main이 직접 관리하는 클래스
+  class Dealer {
+    - checker: PokerHandChecker
+    + checkWinner(players: ArrayList<Player>)
+  }
+
+  class Deck {
+    + final CARD_NUM: int = 52
+    - cardArr: Card[]
+    + Deck()
+    + pick(): Card
+    + shuffle()
+  }
+
+  class Player {
+    - nickName: String
+    - winGames: int
+    - loseGame: int
+    - points: int
+    - gameMoney: int
+    - cards: Card[5]
+    + Player(nickName: String)
+    + toString(): String
+  }
+
+  ' 3단계: Dealer가 사용하는 클래스
+  class PokerHandChecker {
+    + isRoyalFlush(cards: Card[]): boolean
+    + isStraightFlush(cards: Card[]): boolean
+    + isFourOfAKind(cards: Card[]): boolean
+    + isFullHouse(cards: Card[]): boolean
+    + isFlush(cards: Card[]): boolean
+    + isStraight(cards: Card[]): boolean
+    + isThreeOfAKind(cards: Card[]): boolean
+    + isTwoPair(cards: Card[]): boolean
+    + isOnePair(cards: Card[]): boolean
+    + getHighCardScore(cards: Card[]): int
+  }
+
+  ' 3단계: Player와 관련된 클래스
+  class PointDescending {
+    + compare(o1: Player, o2: Player): int
+  }
+
+  ' 최하단: 공통적으로 사용되는 클래스
+  class Card {
+    + static final KIND_MAX: int = 4
+    + static final NUM_MAX: int = 13
+    - kind: int
+    - number: int
+    + Card(kind: int, number: int)
+  }
+
+  ' 구성(Composition) 관계
+  Main *--> Dealer : contains
+  Main *--> Deck : contains
+  Dealer *--> PokerHandChecker : contains
+  Deck *--> "many" Card : contains
+  Player *--> "5" Card : holds
+
+  ' 집합(Aggregation) 관계
+  Main o--> "many" Player : manages
+
+  ' 의존(Dependency) 관계
+  Dealer -down-> Player : checks
+  PokerHandChecker -down-> Card : uses
+  PointDescending -down-> Player : compares
+  Main -down-> Card : uses in checkDuple
+
+  ' 인터페이스 구현
+  PointDescending .|> Comparator
+
+  ' 레이아웃 조정 (직선 중심)
+  Main -[hidden]down- Dealer
+  Dealer -[hidden]down- PokerHandChecker
+  Main -[hidden]down- Deck
+  Main -[hidden]down- Player
+  Player -[hidden]right- PointDescending
+  Player -[hidden]down- Card
+  Deck -[hidden]down- Card
+
+}
+
+@enduml
